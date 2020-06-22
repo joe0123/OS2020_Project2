@@ -46,6 +46,8 @@ int main (int argc, char* argv[])
 		perror("failed to open /dev/slave_device\n");
 		return 1;
 	}
+	
+	gettimeofday(&start ,NULL);
 
 	//src = mmap(NULL, NPAGE * PAGE_SIZE , PROT_READ, MAP_SHARED, dev_fd, 0);
 	src = mmap(NULL, MAP_SIZE, PROT_READ, MAP_SHARED, dev_fd, 0);
@@ -61,8 +63,6 @@ int main (int argc, char* argv[])
 			perror("ioclt create slave socket error\n");
 			return 1;
 		}
-		if(i==0)
-			gettimeofday(&start ,NULL);
 
 		write(1, "ioctl success\n", 14);
 		switch(method[0])

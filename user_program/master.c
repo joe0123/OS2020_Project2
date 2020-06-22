@@ -13,7 +13,7 @@
 
 #define PAGE_SIZE 4096
 #define BUF_SIZE 512
-#define MAP_SIZE (PAGE_SIZE * 10)
+#define MAP_SIZE (PAGE_SIZE * 50)
 
 size_t get_filesize(const char* filename);//get the size of the input file
 
@@ -44,6 +44,8 @@ int main (int argc, char* argv[])
 		perror("failed to open /dev/master_device\n");
 		return 1;
 	}
+	
+	gettimeofday(&start ,NULL);
 
 	//dst = mmap(NULL, NPAGE * PAGE_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, dev_fd, 0);
 	dst = mmap(NULL, MAP_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, dev_fd, 0);
@@ -64,8 +66,6 @@ int main (int argc, char* argv[])
 			perror("ioclt server create socket error\n");
 			return 1;
 		}
-		if(i==0)
-			gettimeofday(&start ,NULL);
 
 		switch(method[0])
 		{
