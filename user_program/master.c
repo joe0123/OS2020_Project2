@@ -12,8 +12,8 @@
 #include <assert.h>
 
 #define PAGE_SIZE 4096
-#define BUF_SIZE 512
-#define MAP_SIZE (PAGE_SIZE * 50)
+#define BUF_SIZE PAGE_SIZE
+#define MAP_SIZE PAGE_SIZE
 
 size_t get_filesize(const char* filename);//get the size of the input file
 

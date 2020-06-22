@@ -12,8 +12,8 @@
 #include <assert.h>
 
 #define PAGE_SIZE 4096
-#define BUF_SIZE 512
-#define MAP_SIZE (PAGE_SIZE * 50)
+#define BUF_SIZE PAGE_SIZE
+#define MAP_SIZE PAGE_SIZE
 
 int main (int argc, char* argv[])
 {
