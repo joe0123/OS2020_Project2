@@ -12,6 +12,7 @@
 #include <linux/netdevice.h>
 #include <linux/ip.h>
 #include <linux/in.h>
+#include <linux/uio.h>      // iov_iter
 #include <linux/miscdevice.h>
 #include <asm/uaccess.h>
 #include <linux/delay.h>
@@ -19,7 +20,7 @@
 #include <linux/debugfs.h>
 #include <linux/mm.h>
 #include <asm/page.h>
-
+#include <asm/siginfo.h>  //send_sig_info
 
 #ifndef VM_RESERVED
 #define VM_RESERVED   (VM_DONTEXPAND | VM_DONTDUMP)
@@ -29,12 +30,9 @@
 #define slave_IOCTL_MMAP 0x12345678
 #define slave_IOCTL_EXIT 0x12345679
 
-#define PAGE_SIZE 4096
-#define BUF_SIZE PAGE_SIZE
+#define BUF_SIZE 512
 #define MAP_SIZE PAGE_SIZE
-
-
-
+//#define MAP_SIZE (PAGE_SIZE * 10)
 
 struct dentry  *file1;//debug file
 
@@ -64,12 +62,20 @@ static struct sockaddr_in addr_srv; //address of the master server
 void mmap_open(struct vm_area_struct *vma) { /* do nothing */ }
 void mmap_close(struct vm_area_struct *vma) { /* do nothing */ }
 
+
+//#ifdef ASYNCHRONOUS
+ssize_t async_receive_msg(struct kiocb *iocb, struct iov_iter *iter);
+static struct workqueue_struct *io_wq;
+//#endif
+
+
 //file operations
 static struct file_operations slave_fops = {
 	.owner = THIS_MODULE,
 	.unlocked_ioctl = slave_ioctl,
 	.open = slave_open,
 	.read = receive_msg,
+	.read_iter = async_receive_msg,
 	.mmap = slave_mmap,
 	.release = slave_close
 };
@@ -97,6 +103,15 @@ static int __init slave_init(void)
 		return ret;
 	}
 
+	//#ifdef ASYNCHRONOUS
+	if(( io_wq = create_workqueue("slave_wq"))==NULL)
+	{
+		printk(KERN_ERR "create_workqueue slave_wq returned NULL\n");
+		return -1;
+	}
+	printk(KERN_INFO "slave using asychronous");
+	//#endif
+
 	printk(KERN_INFO "slave has been registered!\n");
 
 	return 0;
@@ -105,6 +120,9 @@ static int __init slave_init(void)
 static void __exit slave_exit(void)
 {
 	misc_deregister(&slave_dev);
+	//#ifdef ASYNCHRONOUS
+	destroy_workqueue(io_wq);
+	//#endif
 	printk(KERN_INFO "slave exited!\n");
 	debugfs_remove(file1);
 }
@@ -121,6 +139,7 @@ int slave_open(struct inode *inode, struct file *filp)
 	filp->private_data = kmalloc(MAP_SIZE, GFP_KERNEL);
 	return 0;
 }
+
 static long slave_ioctl(struct file *file, unsigned int ioctl_num, unsigned long ioctl_param)
 {
 	long ret = -EINVAL;
@@ -140,7 +159,7 @@ static long slave_ioctl(struct file *file, unsigned int ioctl_num, unsigned long
 	old_fs = get_fs();
 	set_fs(KERNEL_DS);
 
-	//printk("slave device ioctl");
+	printk("slave device ioctl");
 
 	switch(ioctl_num){
 		case slave_IOCTL_CREATESOCK:// create socket and connect to master
@@ -173,6 +192,7 @@ static long slave_ioctl(struct file *file, unsigned int ioctl_num, unsigned long
 			printk("connected to : %s %d\n", tmp, ntohs(addr_srv.sin_port));
 			kfree(tmp);
 			printk("kfree(tmp)");
+
 			ret = 0;
 			break;
 		case slave_IOCTL_MMAP:
@@ -188,23 +208,12 @@ static long slave_ioctl(struct file *file, unsigned int ioctl_num, unsigned long
 			ret = 0;
 			break;
 		default:
-			#define check_table(TYPE, table) \
-				if ( TYPE##_none(table) || TYPE##_bad(table)) { printk("slave: bad " # TYPE); break;}
-			printk("slave: trying to print page descriptor...");
 			pgd = pgd_offset(current->mm, ioctl_param);
-			check_table(pgd, *pgd);
 			p4d = p4d_offset(pgd, ioctl_param);
-			check_table(p4d, *p4d);
 			pud = pud_offset(p4d, ioctl_param);
-			check_table(pud, *pud);
 			pmd = pmd_offset(pud, ioctl_param);
-			check_table(pmd, *pmd);
-			#undef check_table
 			ptep = pte_offset_kernel(pmd , ioctl_param);
 			pte = *ptep;
-			if (pte_none(pte)){
-				printk("slave: bad pte");
-			}
 			printk("slave: %lX\n", pte);
 			ret = 0;
 			break;
@@ -224,6 +233,56 @@ ssize_t receive_msg(struct file *filp, char *buf, size_t count, loff_t *offp )
 		return -ENOMEM;
 	return len;
 }
+
+
+//#ifdef ASYNCHRONOUS
+struct receive_msg_data{
+    struct kiocb *iocb;
+    struct iov_iter *iter;
+    struct work_struct work;
+};
+void receive_msg_work(struct work_struct *work){
+	struct receive_msg_data *param= container_of(work, struct receive_msg_data, work);
+	int ret = 0;
+	ret = receive_msg(param->iocb->ki_filp, param->iter->iov->iov_base, param->iter->iov->iov_len, &(param->iocb->ki_pos));
+	/*
+	//send signal
+	sturct task_struct *t;
+	if( (t = pid_task( find_vpid(pid), PIDTYPE_PID)) == NULL){
+		printk(KERN_ERR "slave: pid_task returned NULL\n");
+		return;
+	}
+	
+	struct siginfo info;
+	info.si_signo= 44;
+	*/
+	/* real-time signals should use SI_QUEUE */
+	/*
+	info.si_code = SI_QUEUE;
+	info._si_fields._rt._sigval= {.sival_int .sival_ptr};
+	send_sig_info(44, &info, t); 	//44, a real-time sigal
+	*/
+	param->iocb->ki_complete(param->iocb, ret, 0);
+	return;
+}
+
+ssize_t async_receive_msg(struct kiocb *iocb, struct iov_iter *iter){
+	struct receive_msg_data *my_data = (struct receive_msg_data*)kmalloc(sizeof(struct receive_msg_data), GFP_KERNEL);
+	my_data->iocb = iocb;
+	if( iocb->ki_complete == NULL)
+	{
+		printk(KERN_ERR "no ki_complete....................\n");
+		return -1;
+	}
+	my_data->iter = iter;
+
+   	INIT_WORK( &(my_data->work), receive_msg_work);
+	queue_work(io_wq, &(my_data->work));
+	return -EIOCBQUEUED;
+}
+//#endif
+
+
 static int slave_mmap(struct file *filp, struct vm_area_struct *vma)
 {
 	/* Remap-pfn-range will mark the range VM_IO */
@@ -236,8 +295,7 @@ static int slave_mmap(struct file *filp, struct vm_area_struct *vma)
 }
 
 
-
-
 module_init(slave_init);
 module_exit(slave_exit);
+
 MODULE_LICENSE("GPL");
