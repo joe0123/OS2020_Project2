@@ -50,7 +50,8 @@ int main (int argc, char* argv[])
 	gettimeofday(&start ,NULL);
 
 	//src = mmap(NULL, NPAGE * PAGE_SIZE , PROT_READ, MAP_SHARED, dev_fd, 0);
-	src = mmap(NULL, MAP_SIZE, PROT_READ, MAP_SHARED, dev_fd, 0);
+	if(method[0] == 'm')
+		src = mmap(NULL, MAP_SIZE, PROT_READ, MAP_SHARED, dev_fd, 0);
 	for(int i=0;i<num_of_file;i++){
 		file_size=0;
 		if( (file_fd = open (file_name[i], O_RDWR | O_CREAT | O_TRUNC)) < 0)
