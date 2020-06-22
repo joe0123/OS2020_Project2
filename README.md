@@ -25,8 +25,8 @@
 
 * Setup
 ```bash
-git clone https://github.com/hc07180011/OS2020-Project2-Group23.git
-cd OS2020-Project2-Group23/
+git clone https://github.com/joe0123/OS2020_Project2.git
+cd OS2020_Project2/
 sudo ./compile.sh
 cd user_program/
 sudo ./gendata.sh
@@ -34,9 +34,14 @@ sudo ./gendata.sh
 
 * Run
 ```bash
-# on two terminal
+# run commands on two terminals
 sudo ./master 1 0.in mmap
 sudo ./slave 1 0.out mmap 127.0.0.1
+```
+```
+# or run bash scripts instead
+./run_master1.sh mmap
+./run_slave1.sh mmap
 ```
 
 * It should generate a file ```0.out``` without any error.
