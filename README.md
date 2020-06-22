@@ -29,14 +29,14 @@ git clone https://github.com/hc07180011/OS2020-Project2-Group23.git
 cd OS2020-Project2-Group23/
 sudo ./compile.sh
 cd user_program/
-dd if=/dev/urandom of=0.in bs=64M count=1
+sudo ./gendata.sh
 ```
 
 * Run
 ```bash
 # on two terminal
-sudo ./master 0.in mmap
-sudo ./slave 0.out mmap 127.0.0.1
+sudo ./master 1 0.in mmap
+sudo ./slave 1 0.out mmap 127.0.0.1
 ```
 
 * It should generate a file ```0.out``` without any error.
