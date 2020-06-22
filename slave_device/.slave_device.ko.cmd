@@ -1,0 +1,1 @@
+cmd_/home/boewoei/OS_tmp/slave_device/slave_device.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/boewoei/OS_tmp/slave_device/slave_device.ko /home/boewoei/OS_tmp/slave_device/slave_device.o /home/boewoei/OS_tmp/slave_device/slave_device.mod.o ;  true

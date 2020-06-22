@@ -1,0 +1,1 @@
+cmd_/home/boewoei/OS_tmp/master_device/master_device.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/boewoei/OS_tmp/master_device/master_device.ko /home/boewoei/OS_tmp/master_device/master_device.o /home/boewoei/OS_tmp/master_device/master_device.mod.o ;  true

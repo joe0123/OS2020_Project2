@@ -1,0 +1,1 @@
+cmd_/home/boewoei/OS_tmp/ksocket/ksocket.ko := ld -r -m elf_x86_64 -T ./scripts/module-common.lds --build-id  -o /home/boewoei/OS_tmp/ksocket/ksocket.ko /home/boewoei/OS_tmp/ksocket/ksocket.o /home/boewoei/OS_tmp/ksocket/ksocket.mod.o ;  true
