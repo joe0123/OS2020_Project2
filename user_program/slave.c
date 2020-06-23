@@ -104,11 +104,13 @@ int main (int argc, char* argv[])
 	gettimeofday(&end, NULL);
 	trans_time = (end.tv_sec - start.tv_sec)*1000 + (end.tv_usec - start.tv_usec)*0.001;
 	printf("Slave: Transmission time: %lf ms, File size: %ld bytes\n", trans_time, file_size_sum);
-	ioctl(dev_fd, 0x111, src);
-	if(munmap(src, MAP_SIZE) == -1 && ret > 0){
-		fprintf(stderr, "Cannot unmap\n");
-		exit(9);
-	}
+	if(method[0] == 'm'){
+	    ioctl(dev_fd, 0x111, src);
+	    if(munmap(src, MAP_SIZE) == -1 && ret > 0){
+		    fprintf(stderr, "Cannot unmap\n");
+		    exit(9);
+	    }
+    }
 	close(dev_fd);
 
 
