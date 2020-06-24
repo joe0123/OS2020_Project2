@@ -31,7 +31,7 @@ sudo ./init.sh
 sudo ./compile.sh
 cd user_program/
 ```
-其中，由於input和output檔案過大，因此需要用init.sh下載。
+Note that our input and output files are too large to be uploaded to github. Therefore, they have to be downloaded by `./init.sh`.
 
 * Run
 ```bash
