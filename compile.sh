@@ -2,9 +2,10 @@
 cd ./ksocket
 if [ $1="bonus" ]
 then
+    echo "bonus"
     make CFLAGS=-DBONUS
 else
-make
+    make
 fi
 insmod ksocket.ko
 cd ../master_device

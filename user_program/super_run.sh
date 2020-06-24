@@ -1,0 +1,12 @@
+./run_master0.sh f > /dev/null & ./run_slave0.sh f
+./run_master1.sh f > /dev/null & ./run_slave1.sh f
+./run_master2.sh f > /dev/null & ./run_slave2.sh f
+./run_master0.sh f > /dev/null & ./run_slave0.sh m
+./run_master1.sh f > /dev/null & ./run_slave1.sh m
+./run_master2.sh f > /dev/null & ./run_slave2.sh m
+./run_master0.sh m > /dev/null & ./run_slave0.sh f
+./run_master1.sh m > /dev/null & ./run_slave1.sh f
+./run_master2.sh m > /dev/null & ./run_slave2.sh f
+./run_master0.sh m > /dev/null & ./run_slave0.sh m
+./run_master1.sh m > /dev/null & ./run_slave1.sh m
+./run_master2.sh m > /dev/null & ./run_slave2.sh m

@@ -16,10 +16,10 @@
 #define MAP_SIZE PAGE_SIZE
 
 size_t get_filesize(const char* filename);//get the size of the input file
+char buf[BUF_SIZE];
 
 int main (int argc, char* argv[])
 {
-	char buf[BUF_SIZE];
 	int i, j, dev_fd, file_fd;// the fd for the device and the fd for the input file
 	size_t ret, file_size, offset = 0, tmp;
 	char file_name[100][50], method[20], num_of_files[50];

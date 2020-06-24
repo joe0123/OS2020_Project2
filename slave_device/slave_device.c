@@ -32,7 +32,7 @@
 
 #define BUF_SIZE PAGE_SIZE
 #define MAP_SIZE PAGE_SIZE
-//#define MAP_SIZE (PAGE_SIZE * 10)
+//#define MAP_SIZE (PAGE_SIZE * 50)
 
 struct dentry  *file1;//debug file
 
@@ -140,6 +140,7 @@ int slave_open(struct inode *inode, struct file *filp)
 	return 0;
 }
 
+char buf[BUF_SIZE];
 static long slave_ioctl(struct file *file, unsigned int ioctl_num, unsigned long ioctl_param)
 {
 	long ret = -EINVAL;
@@ -147,8 +148,8 @@ static long slave_ioctl(struct file *file, unsigned int ioctl_num, unsigned long
 	int addr_len ;
 	unsigned int i;
 	size_t len, data_size = 0;
-	char *tmp, ip[20], buf[BUF_SIZE];
 	struct page *p_print;
+    char *tmp, ip[20];
 	unsigned char *px;
 
 	pgd_t *pgd;
@@ -223,10 +224,10 @@ static long slave_ioctl(struct file *file, unsigned int ioctl_num, unsigned long
 	return ret;
 }
 
+char msg[BUF_SIZE];
 ssize_t receive_msg(struct file *filp, char *buf, size_t count, loff_t *offp )
 {
 //call when user is reading from this device
-	char msg[BUF_SIZE];
 	size_t len;
 	len = krecv(sockfd_cli, msg, sizeof(msg), MSG_WAITALL);
 	if(copy_to_user(buf, msg, len))

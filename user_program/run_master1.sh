@@ -1,1 +1,2 @@
-sudo ./master 5 1.in00 1.in01 1.in02 1.in03 1.in04 $1
+dir="../input/gen_data/"
+sudo ./master 5 "$dir"1.in00 "$dir"1.in01 "$dir"1.in02 "$dir"1.in03 "$dir"1.in04 $1
