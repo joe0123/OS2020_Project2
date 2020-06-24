@@ -31,6 +31,7 @@ sudo ./init.sh
 sudo ./compile.sh
 cd user_program/
 ```
+其中，由於input和output檔案過大，因此需要用init.sh下載。
 
 * Run
 ```bash
