@@ -1,6 +1,6 @@
 # 2020 OS Project 2 - Synchronous Virtual Device
 
-## Members
+## Group 23 Members
 
 * B06902017 趙允祥
 * B06902105 吳吉加
