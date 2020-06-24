@@ -1,6 +1,6 @@
 # 2020 OS Project 2 - Synchronous Virtual Device
 
-## Member
+## Members
 
 * B06902017 趙允祥
 * B06902105 吳吉加
@@ -27,9 +27,9 @@
 ```bash
 git clone https://github.com/joe0123/OS2020_Project2.git
 cd OS2020_Project2/
+sudo ./init.sh
 sudo ./compile.sh
 cd user_program/
-sudo ./gendata.sh
 ```
 
 * Run
@@ -44,6 +44,8 @@ sudo ./slave 1 0.out mmap 127.0.0.1
 ./run_slave1.sh mmap
 ```
 
-* It should generate a file ```0.out``` without any error.
+* It should generate a file `0.out` without any error.
 
 ## Report
+
+* https://github.com/joe0123/OS2020_Project2/blob/master/report.pdf
