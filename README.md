@@ -1,4 +1,5 @@
-# 2020 OS Project 2 - Synchronous Virtual Device
+# Synchronous Virtual Device
+Operating System 2020 Project 2
 
 ## Group 23 Members
 
